@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const sqlite3 = require('sqlite3');
 const { Pool } = require('pg');  // PostgreSQL hinzufügen
@@ -10,12 +12,13 @@ app.use(express.json());
 
 // **PostgreSQL**-Verbindung für `/tasks`
 const pgPool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'todo_app',  // Deine PostgreSQL-Datenbank
-  password: '6789',  // Dein PostgreSQL-Passwort
-  port: 5432,
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
 });
+
 
 // **SQLite**-Verbindung für `/add`
 const db = new sqlite3.Database('./tasks.db');

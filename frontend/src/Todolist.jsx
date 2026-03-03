@@ -54,6 +54,18 @@ function Todolist() {
 
   // Aufgabe bearbeiten
   const saveEditTask = () => {
+
+    if (isHomePage) {
+      setTasks(tasks.map(task =>
+        task.id === editTaskId
+          ? { ...task, task: editText }
+          : task
+      ));
+      setEditTaskId(null);
+      setEditText("");
+      return;
+    }
+
     const url = isAddPage ? `http://localhost:5000/add/${editTaskId}` : `http://localhost:5000/tasks/${editTaskId}`;
     fetch(url, {
       method: "PUT",
@@ -85,6 +97,16 @@ function Todolist() {
 
   // Aufgabe als erledigt markieren
   const toggleCompleted = (id) => {
+    
+    if (isHomePage) {
+      setTasks(tasks.map(task =>
+        task.id === id
+          ? { ...task, checked: !task.checked }
+          : task
+      ));
+      return;
+    }
+
     const task = tasks.find((task) => task.id === id);
     fetch(`http://localhost:5000/${isAddPage ? 'add' : 'tasks'}/${id}`, {
       method: "PUT",
@@ -92,7 +114,7 @@ function Todolist() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        task: isAddPage ? task.task : task.pgtask,  // Hier `task.task` für SQLite und `task.pgtask` für PostgreSQL
+        task: task.task || task.pgtask,  // Hier `task.task` für SQLite und `task.pgtask` für PostgreSQL
         checked: !task.checked,  // `checked` für SQLite und `completed` für PostgreSQL
       }),
     })
@@ -175,7 +197,7 @@ function Todolist() {
                 className="edit-button"
                 onClick={() => {
                   setEditTaskId(task.id);
-                  setEditText(isAddPage ? task.task : task.pgtask);  // `task.task` für SQLite und `task.pgtask` für PostgreSQL
+                  setEditText(task.task || task.pgtask); // `task.task` für SQLite und `task.pgtask` für PostgreSQL
                 }}
               >
                 Bearbeiten
